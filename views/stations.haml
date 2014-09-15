@@ -1,0 +1,7 @@
+%ul
+  - @stations.each do |station|
+    %li
+      %ul
+        %li= station[:code]
+        %li= station[:railway]
+        %li= station[:title]
