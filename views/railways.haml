@@ -1,0 +1,6 @@
+%ul
+  - @railways.each do |railway|
+    %li= railway[:title]
+    %ul
+      - railway[:station_list].each do |station|
+        %li= station['odpt:station']

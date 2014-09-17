@@ -27,7 +27,7 @@ get '/stations', provides: 'html' do
   @stations = []
   JSON.parse(res.body).each do |line|
     title = line['dc:title']
-    railway = line['odpt:railway']
+    railway = line['odpt:railway'].split(':').last
     code = line['odpt:stationCode']
 
     station_info = {
@@ -43,7 +43,6 @@ get '/stations', provides: 'html' do
 end
 
 get '/stations/:name', provides: 'html' do
-  p params
   uri = URI.parse('%s?rdf:type=odpt:Station&owl:sameAs=%s&acl:consumerKey=%s'%[DATAPOINTS_URL, params[:name], ACCESS_TOKEN])
 
   https = Net::HTTP.new(uri.host, uri.port)
@@ -55,7 +54,7 @@ get '/stations/:name', provides: 'html' do
   @stations = []
   JSON.parse(res.body).each do |line|
     title = line['dc:title']
-    railway = line['odpt:railway']
+    railway = line['odpt:railway'].split(':').last
     code = line['odpt:stationCode']
 
     station_info = {
@@ -68,4 +67,30 @@ get '/stations/:name', provides: 'html' do
   end
 
   haml :stations
+end
+
+get '/railways/', provides: 'html' do
+  uri = URI.parse('%s?rdf:type=odpt:Railway&acl:consumerKey=%s'%[DATAPOINTS_URL, ACCESS_TOKEN])
+
+  https = Net::HTTP.new(uri.host, uri.port)
+  https.use_ssl = true
+  res = https.start do
+    https.get(uri.request_uri)
+  end
+
+  @railways = []
+  JSON.parse(res.body).each do |line|
+    linecode = line['odpt:linecode']
+    title = line['dc:title']
+    station_list = line['odpt:stationOrder']
+
+    railway_info = {
+      linecode: linecode,
+      title: title,
+      station_list: station_list
+    }
+
+    @railways.push(railway_info)
+  end
+  haml :railways
 end
