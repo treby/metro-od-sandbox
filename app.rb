@@ -69,7 +69,7 @@ get '/stations/:name', provides: 'html' do
   haml :stations
 end
 
-get '/railways/', provides: 'html' do
+get '/railways', provides: 'html' do
   uri = URI.parse('%s?rdf:type=odpt:Railway&acl:consumerKey=%s'%[DATAPOINTS_URL, ACCESS_TOKEN])
 
   https = Net::HTTP.new(uri.host, uri.port)
