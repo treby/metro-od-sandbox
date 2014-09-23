@@ -11,18 +11,25 @@ API_ENDPOINT   = 'https://api.tokyometroapp.jp/api/v2/'
 DATAPOINTS_URL = API_ENDPOINT + "datapoints"
 ACCESS_TOKEN   = SETTINGS['token']
 
+helpers do
+  def https_request(type)
+    uri = URI.parse('%s?rdf:type=%s&acl:consumerKey=%s'%[DATAPOINTS_URL, type, ACCESS_TOKEN])
+    https = Net::HTTP.new(uri.host, uri.port)
+    https.use_ssl = true
+    res = https.start do
+        https.get(uri.request_uri)
+    end
+  end
+end
+
+
+
 get '/', provides: 'html' do
   haml :index
 end
 
 get '/stations', provides: 'html' do
-  uri = URI.parse('%s?rdf:type=odpt:Station&acl:consumerKey=%s'%[DATAPOINTS_URL, ACCESS_TOKEN])
-
-  https = Net::HTTP.new(uri.host, uri.port)
-  https.use_ssl = true
-  res = https.start do
-    https.get(uri.request_uri)
-  end
+  res = https_request 'odpt:Station'
 
   @stations = []
   JSON.parse(res.body).each do |line|
@@ -43,13 +50,7 @@ get '/stations', provides: 'html' do
 end
 
 get '/stations/:name', provides: 'html' do
-  uri = URI.parse('%s?rdf:type=odpt:Station&owl:sameAs=%s&acl:consumerKey=%s'%[DATAPOINTS_URL, params[:name], ACCESS_TOKEN])
-
-  https = Net::HTTP.new(uri.host, uri.port)
-  https.use_ssl = true
-  res = https.start do
-    https.get(uri.request_uri)
-  end
+  res = https_request 'odpt:Station'
 
   @stations = []
   JSON.parse(res.body).each do |line|
@@ -70,13 +71,7 @@ get '/stations/:name', provides: 'html' do
 end
 
 get '/railways', provides: 'html' do
-  uri = URI.parse('%s?rdf:type=odpt:Railway&acl:consumerKey=%s'%[DATAPOINTS_URL, ACCESS_TOKEN])
-
-  https = Net::HTTP.new(uri.host, uri.port)
-  https.use_ssl = true
-  res = https.start do
-    https.get(uri.request_uri)
-  end
+  res = https_request 'odpt:Railway'
 
   @railways = []
   JSON.parse(res.body).each do |line|
