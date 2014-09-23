@@ -22,34 +22,11 @@ helpers do
   end
 end
 
-
-
 get '/', provides: 'html' do
   haml :index
 end
 
 get '/stations', provides: 'html' do
-  res = https_request 'odpt:Station'
-
-  @stations = []
-  JSON.parse(res.body).each do |line|
-    title = line['dc:title']
-    railway = line['odpt:railway'].split(':').last
-    code = line['odpt:stationCode']
-
-    station_info = {
-      code: code,
-      railway: railway,
-      title: title
-    }
-
-    @stations.push(station_info)
-  end
-
-  haml :stations
-end
-
-get '/stations/:name', provides: 'html' do
   res = https_request 'odpt:Station'
 
   @stations = []
