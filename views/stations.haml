@@ -1,8 +1,8 @@
-%ul
+%ol
   - @stations.each do |station|
     %li
+      = station[:title]
       %ul
         %li= station[:code]
         %li
           %a{href: "railways/#{station[:railway]}"}= station[:railway]
-        %li= station[:title]
